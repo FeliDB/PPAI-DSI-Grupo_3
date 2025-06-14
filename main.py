@@ -38,9 +38,9 @@ def obtener_estado(nombre):
 # Crear eventos e inicializar objetos necesarios
 cambio_estado_vacio = []
 serie_temporal_vacia = []
-alcance_dummy = AlcanceSismo("cercano", "a")
+alcance_dummy = AlcanceSismo("cercano", "zona urbana")
+origen_dummy = OrigenDeGeneracion("tectónico", "falla tectónica activa")
 clasificacion_dummy = ClasificacionSismo(59, 62, "grave")
-origen_dummy = OrigenDeGeneracion("a", "a")
 
 evento1 = EventoSismico("2025-06-13 09:10:00", "2025-06-13 08:55:00", -31.4201, -31.4255, -64.1888, obtener_estado("pendiente de revisión"), -64.1923, 5.2, cambio_estado_vacio, serie_temporal_vacia, alcance_dummy, clasificacion_dummy, origen_dummy)
 evento2 = EventoSismico("2024-11-01 16:45:00", "2024-11-01 16:30:00", -33.0345, -33.0400, -68.8458, obtener_estado("confirmado"), -68.8501, 4.7, cambio_estado_vacio, serie_temporal_vacia, alcance_dummy, clasificacion_dummy, origen_dummy)

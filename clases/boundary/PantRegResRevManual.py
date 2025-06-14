@@ -33,17 +33,23 @@ class PantRegResRevManual:
         etiqueta_hipocentro.pack(anchor="w")
         etiqueta_magnitud = tk.Label(frame_detalles, text="")
         etiqueta_magnitud.pack(anchor="w")
+        etiqueta_alcance = tk.Label(frame_detalles, text="")  # NUEVO
+        etiqueta_alcance.pack(anchor="w")
+        etiqueta_origen = tk.Label(frame_detalles, text="")  # NUEVO
+        etiqueta_origen.pack(anchor="w")
 
         def actualizar_detalles(event=None):
             idx = combo_opciones.current()
             if idx >= 0:
                 e = lista_eventos[idx]
-                etiqueta_estado.config(text=f"Estado: {e.estado.nombre}")  # Asumiendo que estado es instancia con atributo 'nombre'
+                etiqueta_estado.config(text=f"Estado: {e.estado.nombre}")
                 etiqueta_fecha_fin.config(text=f"Fecha Fin: {e.fechaHoraFin}")
                 etiqueta_fecha_ocurrencia.config(text=f"Fecha Ocurrencia: {e.fechaHoraOcurrencia}")
                 etiqueta_epicentro.config(text=f"Epicentro (lat,long): ({e.latitudEpicentro}, {e.longitudEpicentro})")
                 etiqueta_hipocentro.config(text=f"Hipocentro (lat,long): ({e.latitudHipocentro}, {e.longitudHipocentro})")
                 etiqueta_magnitud.config(text=f"Magnitud: {e.valorMagnitud}")
+                etiqueta_alcance.config(text=f"Alcance: {e.alcanceSismo.nombre}")  # NUEVO
+                etiqueta_origen.config(text=f"Origen: {e.origenGeneracion.descripcion}")  # NUEVO
 
         def bloquear_evento():
             idx = combo_opciones.current()
@@ -56,6 +62,6 @@ class PantRegResRevManual:
         actualizar_detalles()
 
         boton_mostrar = tk.Button(ventana, text="Bloquear Evento Seleccionado", command=bloquear_evento)
-        boton_mostrar.place(x=40, y=250)
+        boton_mostrar.place(x=40, y=330)
 
         ventana.mainloop()
