@@ -18,25 +18,42 @@ class PantRegResRevManual:
         combo_opciones.place(x=40, y=31)
         combo_opciones.current(0)
 
-        frame_detalles = tk.Frame(ventana)
-        frame_detalles.place(x=40, y=80)
+        # Contenedor principal
+        frame_principal = tk.Frame(ventana)
+        frame_principal.place(x=40, y=80)
 
-        etiqueta_estado = tk.Label(frame_detalles, text="")
+        # Frame de detalles generales (columna izquierda)
+        frame_izquierda = tk.Frame(frame_principal)
+        frame_izquierda.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+
+        etiqueta_estado = tk.Label(frame_izquierda, text="")
         etiqueta_estado.pack(anchor="w")
-        etiqueta_fecha_fin = tk.Label(frame_detalles, text="")
+        etiqueta_fecha_fin = tk.Label(frame_izquierda, text="")
         etiqueta_fecha_fin.pack(anchor="w")
-        etiqueta_fecha_ocurrencia = tk.Label(frame_detalles, text="")
+        etiqueta_fecha_ocurrencia = tk.Label(frame_izquierda, text="")
         etiqueta_fecha_ocurrencia.pack(anchor="w")
-        etiqueta_epicentro = tk.Label(frame_detalles, text="")
+        etiqueta_epicentro = tk.Label(frame_izquierda, text="")
         etiqueta_epicentro.pack(anchor="w")
-        etiqueta_hipocentro = tk.Label(frame_detalles, text="")
+        etiqueta_hipocentro = tk.Label(frame_izquierda, text="")
         etiqueta_hipocentro.pack(anchor="w")
-        etiqueta_magnitud = tk.Label(frame_detalles, text="")
+        etiqueta_magnitud = tk.Label(frame_izquierda, text="")
         etiqueta_magnitud.pack(anchor="w")
-        etiqueta_alcance = tk.Label(frame_detalles, text="")  # NUEVO
+        etiqueta_alcance = tk.Label(frame_izquierda, text="")
         etiqueta_alcance.pack(anchor="w")
-        etiqueta_origen = tk.Label(frame_detalles, text="")  # NUEVO
+        etiqueta_origen = tk.Label(frame_izquierda, text="")
         etiqueta_origen.pack(anchor="w")
+
+        # Frame de datos adicionales (columna derecha)
+        frame_derecha = tk.Frame(frame_principal)
+        frame_derecha.grid(row=0, column=1, sticky="ne", padx=60, pady=10)
+
+        etiqueta_titulo_adicionales = tk.Label(frame_derecha, text="Datos Adicionales (Serie Temporal y Muestra)", font=("Arial", 10, "bold"))
+        etiqueta_titulo_adicionales.pack(anchor="w")
+
+        etiqueta_serie_info = tk.Label(frame_derecha, text="")
+        etiqueta_serie_info.pack(anchor="w", pady=10)
+        etiqueta_muestra_valor = tk.Label(frame_derecha, text="")
+        etiqueta_muestra_valor.pack(anchor="w", pady=10)
 
         def actualizar_detalles(event=None):
             idx = combo_opciones.current()
@@ -48,8 +65,12 @@ class PantRegResRevManual:
                 etiqueta_epicentro.config(text=f"Epicentro (lat,long): ({e.latitudEpicentro}, {e.longitudEpicentro})")
                 etiqueta_hipocentro.config(text=f"Hipocentro (lat,long): ({e.latitudHipocentro}, {e.longitudHipocentro})")
                 etiqueta_magnitud.config(text=f"Magnitud: {e.valorMagnitud}")
-                etiqueta_alcance.config(text=f"Alcance: {e.alcanceSismo.nombre}")  # NUEVO
-                etiqueta_origen.config(text=f"Origen: {e.origenGeneracion.descripcion}")  # NUEVO
+                etiqueta_alcance.config(text=f"Alcance: {e.alcanceSismo.nombre}")
+                etiqueta_origen.config(text=f"Origen: {e.origenGeneracion.descripcion}")
+
+                # Ocultar info avanzada hasta bloquear
+                etiqueta_serie_info.config(text="")
+                etiqueta_muestra_valor.config(text="")
 
         def bloquear_evento():
             idx = combo_opciones.current()
@@ -58,10 +79,26 @@ class PantRegResRevManual:
                 self.gestor.cambiarEstadoEvento(evento, "bloqueado en revisión")
                 actualizar_detalles()
 
+                # Mostrar info de SerieTemporal
+                if evento.serieTemporal:
+                    serie = evento.serieTemporal[0]
+                    etiqueta_serie_info.config(
+                        text=f"SerieTemporal:\n  - Alarma: {serie.condicionAlarma}\n  - Registro: {serie.fechaHoraRegistro}\n  - Frecuencia: {serie.frecuenciaMuestreo} Hz"
+                    )
+
+                if hasattr(evento, "listaMuestrasSismicas") and evento.listaMuestrasSismicas:
+                    muestra = evento.listaMuestrasSismicas[0]
+                    etiqueta_muestra_valor.config(
+                        text=f"Muestra Sismica:\n  - Valor: {muestra.detalleMuestraSismica.valor}"
+                    )
+
         combo_opciones.bind("<<ComboboxSelected>>", actualizar_detalles)
         actualizar_detalles()
 
         boton_mostrar = tk.Button(ventana, text="Bloquear Evento Seleccionado", command=bloquear_evento)
         boton_mostrar.place(x=40, y=330)
+
+        cancelar_boton = tk.Button(ventana, text="Cancelar", command=ventana.destroy)
+        cancelar_boton.place(x=40, y=700)
 
         ventana.mainloop()
