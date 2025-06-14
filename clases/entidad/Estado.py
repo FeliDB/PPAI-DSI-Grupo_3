@@ -1,5 +1,4 @@
 class Estado:
 
-    def __init__(self, ambito, nombreEstado):
-        self.ambito = ambito
-        self.nombreEstado = nombreEstado
+    def __init__(self, nombre):
+        self.nombre = nombre

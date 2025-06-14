@@ -23,3 +23,11 @@ class GestorRegResRevManual:
         :return: list de EventoSismico
         """
         return self.eventos
+
+    def cambiarEstadoEvento(self, evento, nombre_estado):
+        for estado in self.lista_estados:
+            if estado.nombre == nombre_estado:
+                evento.estado = estado
+                return
+        raise ValueError(f"No se encontró el estado con nombre '{nombre_estado}'")
+
