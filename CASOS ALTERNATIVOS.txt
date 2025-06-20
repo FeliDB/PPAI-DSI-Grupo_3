@@ -1,4 +1,4 @@
 CASOS ALTERNATIVOS:
 
-A1
-A4
+A1: No hay sismos auto detectados que aún no han sido revisados (cambiar en el array de instancias.py)
+A4: El AS selecciona la opción Solicitar revisión a experto (en la ventana)
