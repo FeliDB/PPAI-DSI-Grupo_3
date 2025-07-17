@@ -14,17 +14,18 @@ from datetime import datetime, timedelta
 
 # Crear instancias de Estado
 estados = [
-    Estado("pendiente de revisión"),
-    Estado("pendiente de cierre"),
-    Estado("bloqueado en revisión"),
-    Estado("derivado a experto"),
-    Estado("confirmado"),
-    Estado("rechazado")
+    Estado("pendiente de revisión", "evento"),
+    Estado("pendiente de cierre", "evento"),
+    Estado("bloqueado en revisión", "evento"),
+    Estado("derivado a experto", "evento"),
+    Estado("confirmado", "evento"),
+    Estado("rechazado", "evento")
 ]
 
 # Usuarios / empleados que cambian estados
-Empleados = [Usuario("usuario123", "12345"), Usuario("usuario246", "24680")]
-Sesion = [Sesion(Empleados[0])]
+Usuarios = [Usuario("usuario123", "12345"), Usuario("usuario246", "24680")]
+Empleados = [Usuarios[0], Usuarios[1]]
+SesionActual = [Usuarios[0]]
 
 # Crear instancias de DetalleMuestraSismica
 detalle1 = DetalleMuestraSismica(valor=0.12)
@@ -90,13 +91,13 @@ eventosSismicos = [
                 fechaHoraFin=datetime.now(),
                 fechaHoraInicio=datetime.now() - timedelta(hours=1),
                 estado=estados[5],
-                empleado=Empleados[0]
+                usuario=Usuarios[0]
             ),
             CambioEstado(
                 fechaHoraFin=datetime.now() + timedelta(minutes=30),
                 fechaHoraInicio=datetime.now(),
                 estado=estados[0],
-                empleado=Empleados[1]
+                usuario=Usuarios[1]
             )
         ],
         serieTemporal=[serie1],
@@ -118,13 +119,13 @@ eventosSismicos = [
                 fechaHoraFin=datetime(2025, 6, 16, 14, 30, 0),
                 fechaHoraInicio=datetime(2025, 6, 16, 13, 30, 0),
                 estado=estados[2],
-                empleado=Empleados[0]
+                usuario=Usuarios[0]
             ),
             CambioEstado(
                 fechaHoraFin=datetime.now(),
                 fechaHoraInicio=datetime(2025, 6, 16, 14, 30, 0),
                 estado=estados[1],
-                empleado=Empleados[1]
+                usuario=Usuarios[1]
             )
         ],
         serieTemporal=[serie2],
@@ -146,13 +147,13 @@ eventosSismicos = [
                 fechaHoraFin=datetime.now() - timedelta(minutes=20),
                 fechaHoraInicio=datetime.now() - timedelta(hours=2),
                 estado=estados[0],
-                empleado=Empleados[1]
+                usuario=Usuarios[1]
             ),
             CambioEstado(
                 fechaHoraFin=datetime.now(),
                 fechaHoraInicio=datetime.now() - timedelta(minutes=20),
                 estado=estados[2],
-                empleado=Empleados[0]
+                usuario=Usuarios[0]
             )
         ],
         serieTemporal=[serie3],
@@ -174,13 +175,13 @@ eventosSismicos = [
                 fechaHoraFin=datetime.now() - timedelta(hours=1),
                 fechaHoraInicio=datetime.now() - timedelta(hours=3),
                 estado=estados[1],
-                empleado=Empleados[0]
+                usuario=Usuarios[0]
             ),
             CambioEstado(
                 fechaHoraFin=datetime.now(),
                 fechaHoraInicio=datetime.now() - timedelta(hours=1),
                 estado=estados[3],
-                empleado=Empleados[1]
+                usuario=Usuarios[1]
             )
         ],
         serieTemporal=[serie4],
@@ -202,13 +203,13 @@ eventosSismicos = [
                 fechaHoraFin=datetime.now() - timedelta(hours=1),
                 fechaHoraInicio=datetime.now() - timedelta(hours=3),
                 estado=estados[0],
-                empleado=Empleados[1]
+                usuario=Usuarios[1]
             ),
             CambioEstado(
                 fechaHoraFin=datetime.now(),
                 fechaHoraInicio=datetime.now() - timedelta(hours=1),
                 estado=estados[3],
-                empleado=Empleados[1]
+                usuario=Usuarios[1]
             )
         ],
         serieTemporal=[serie3],

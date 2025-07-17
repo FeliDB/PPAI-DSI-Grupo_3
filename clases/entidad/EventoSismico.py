@@ -1,4 +1,5 @@
 from clases.entidad.CambioEstado import CambioEstado
+from datetime import datetime
 
 
 class EventoSismico:
@@ -48,13 +49,24 @@ class EventoSismico:
             "cambioEstado": [str(c) for c in self.cambioEstado],
             "serieTemporal": [str(s) for s in self.serieTemporal]
         }
-
-
-    def actualizarEstado(self, fechaHoraInicio, fechaHoraFin, evento, estado, empleado):
-        evento.cambioEstado.append(CambioEstado(fechaHoraInicio, fechaHoraFin, estado, evento.cambioEstado[-1].empleado))
-        print(evento.cambioEstado[-1])
-
     
+    def buscarUltimoCambioEstado(self, estadoActualEvento):
+        if self.cambioEstado[-1] == estadoActualEvento:
+            return True
+    
+    def tomarFechaHoraActual(self):
+        fecha_hora_actual = datetime.now()
+        return fecha_hora_actual
+
+
+    def bloquearEventoSismico(self, estadoActual, usuarioLogueado):
+        self.cambioEstado.append(CambioEstado(self.tomarFechaHoraActual(), self.tomarFechaHoraActual(), estadoActual, usuarioLogueado))
+        self.estado.cambiarEstadoBloqueado()
+
     def getDatosSismicos(self):
         print(f"[DEBUG] Series en evento: {len(self.serieTemporal)}")
         return [serie.getMuestras() for serie in self.serieTemporal]
+    
+    def rechazarEventoSismico(self, estadoRechazado, usuarioLogueado):
+        self.cambioEstado.append(CambioEstado(self.tomarFechaHoraActual(), self.tomarFechaHoraActual(), estadoRechazado, usuarioLogueado))
+        self.estado.cambiarEstadoRechazado()

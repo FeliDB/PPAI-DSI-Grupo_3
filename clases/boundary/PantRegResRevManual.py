@@ -20,168 +20,19 @@ class PantRegResRevManual:
         seleccion = opcion_var.get()
 
         if seleccion == "1":
-            self.gestor.actualizarCambioEstado(evento, seleccion)
             messagebox.showinfo("Confirmado", "El evento fue confirmado.")
         elif seleccion == "2":
-            self.gestor.actualizarCambioEstado(evento, seleccion)
+            self.gestor.rechazarEventoSismico(evento)
             messagebox.showinfo("Rechazado", "El evento fue rechazado.")
         elif seleccion == "3":
-            self.gestor.actualizarCambioEstado(evento, seleccion)
             messagebox.showinfo("Solicitado", "Se solicitó revisión a un experto.")
         else:
             messagebox.showwarning("Error", "Por favor selecciona una acción.")
 
     def habilitarVentana(self):
-
-        def bloquearEvento():
-            seleccion = eventos_lista.curselection()
-            if not seleccion:
-                messagebox.showwarning("Advertencia", "Por favor, seleccioná un evento.")
-                return
-
-            index = seleccion[0]
-            evento = self.eventos_cargados[index]
-            self.gestor.bloquearEventoSismicoYRevisar(evento)
-            messagebox.showinfo("Éxito", "Evento bloqueado con éxito.")
-
-            info = self.gestor.buscarDatosSismicos(evento)
-
-            ventana_muestras = tk.Toplevel(ventana)
-            ventana_muestras.title("Información del Evento Sísmico")
-            ventana_muestras.geometry("700x500")
-
-            def formatear_info(info):
-                def procesar_objeto(obj, nivel=0):
-                    texto = ""
-                    sangria = "  " * nivel
-                    if hasattr(obj, '__dict__'):
-                        for k, v in vars(obj).items():
-                            if hasattr(v, '__dict__'):
-                                texto += f"{sangria}{k}:\n"
-                                texto += procesar_objeto(v, nivel + 1)
-                            else:
-                                texto += f"{sangria}{k}: {v}\n"
-                    else:
-                        texto += f"{sangria}{obj}\n"
-                    return texto
-
-                texto = ""
-                if not info:
-                    return "No se encontraron datos."
-
-                if isinstance(info, list):
-                    for i, item in enumerate(info, start=1):
-                        texto += f"[{i}]\n"
-                        if isinstance(item, list):
-                            for j, subitem in enumerate(item, start=1):
-                                texto += f"  ({j})\n"
-                                texto += procesar_objeto(subitem, nivel=2)
-                        else:
-                            texto += procesar_objeto(item, nivel=1)
-                        texto += "\n"
-                else:
-                    texto += procesar_objeto(info)
-
-                return texto
-
-            texto_formateado = formatear_info(info)
-
-            frame_scroll = tk.Frame(ventana_muestras)
-            frame_scroll.pack(fill=tk.BOTH, expand=True)
-
-            canvas = tk.Canvas(frame_scroll)
-            scrollbar = tk.Scrollbar(frame_scroll, orient="vertical", command=canvas.yview)
-            scroll_frame = tk.Frame(canvas)
-
-            scroll_frame.bind(
-                "<Configure>",
-                lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-            )
-
-            canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
-            canvas.configure(yscrollcommand=scrollbar.set)
-
-            canvas.pack(side="left", fill="both", expand=True)
-            scrollbar.pack(side="right", fill="y")
-
-            label_info = tk.Label(
-                scroll_frame,
-                text=texto_formateado,
-                font=("Courier New", 10),
-                justify="left",
-                anchor="nw"
-            )
-            label_info.pack(fill="both", expand=True, padx=10, pady=10)
-
-            boton_mapa = tk.Button(ventana_muestras, text="Ver Mapa")
-            boton_mapa.place(x=300, y=450)
-
-            ventana_muestras.update_idletasks()
-
-            x = ventana_muestras.winfo_x()
-            y = ventana_muestras.winfo_y()
-            ancho = ventana_muestras.winfo_width()
-
-            ancho_sismo = 500
-            alto_sismo = 400
-
-            nueva_x = x + ancho + 10
-            nueva_y = y
-
-            sismograma_ventana = tk.Toplevel(ventana_muestras)
-            sismograma_ventana.title("Sismograma y Modificación")
-            sismograma_ventana.geometry(f"{ancho_sismo}x{alto_sismo}+{nueva_x}+{nueva_y}")
-
-            mod_label = tk.Label(sismograma_ventana, text="Modificación de Datos del Evento (opcional):", font=("Arial", 12, "bold"))
-            mod_label.place(x=20, y=20)
-
-            magnitud_label = tk.Label(sismograma_ventana, text="Magnitud:", font=("Arial", 10, "bold"))
-            magnitud_label.place(x=20, y=60)
-            magnitud_input = tk.Entry(sismograma_ventana)
-            magnitud_input.place(x=20, y=80)
-
-            alcance_label = tk.Label(sismograma_ventana, text="Alcance:", font=("Arial", 10, "bold"))
-            alcance_label.place(x=20, y=120)
-            alcance_input = tk.Entry(sismograma_ventana)
-            alcance_input.place(x=20, y=140)
-
-            origen_label = tk.Label(sismograma_ventana, text="Origen:", font=("Arial", 10, "bold"))
-            origen_label.place(x=20, y=180)
-            origen_input = tk.Entry(sismograma_ventana)
-            origen_input.place(x=20, y=200)
-
-            modificar_button = tk.Button(sismograma_ventana, text="Modificar Datos")
-            modificar_button.place(x=20, y=240)
-
-            sismograma_text = tk.Label(ventana, text="Sismograma", font=("Arial", 12, "bold"))
-            sismograma_text.place(x=800, y=20)
-
-            sismograma = Image.open("sismograma.jpg")
-            sismograma_pic = ImageTk.PhotoImage(sismograma)
-
-            sismograma_label = tk.Label(ventana, image=sismograma_pic)
-            sismograma_label.image = sismograma_pic
-            sismograma_label.place(x=800, y=60)
-
-            opcion = tk.StringVar(value="1")
-            confirmar = tk.Radiobutton(ventana, text="Confirmar Evento", variable=opcion, value="1")
-            rechazar = tk.Radiobutton(ventana, text="Rechazar Evento", variable=opcion, value="2")
-            solicitarRAE = tk.Radiobutton(ventana, text="Solicitar Revisión a Experto", variable=opcion, value="3")
-
-            confirmar.place(x=800, y=350)
-            rechazar.place(x=800, y=380)
-            solicitarRAE.place(x=800, y=410)
-
-            confirmacion_boton = tk.Button(
-                ventana,
-                text="Confirmar Selección de Acción",
-                command=lambda: self.procesarAccion(opcion, evento)
-            )
-            confirmacion_boton.place(x=800, y=450)
-
         ventana = tk.Tk()
         ventana.title("Registrar resultado de revisión manual")
-        ventana.geometry("1410x510")
+        ventana.geometry("1650x750")
 
         eventos_label = tk.Label(ventana, text="Eventos Sísmicos:", font=("Arial", 12, "bold"))
         eventos_label.place(x=25, y=20)
@@ -230,7 +81,81 @@ class PantRegResRevManual:
 
         eventos_lista.bind("<<ListboxSelect>>", actualizar_datos)
 
-        boton_bloquear = tk.Button(ventana, text="Seleccionar Evento", command=bloquearEvento)
+        boton_bloquear = tk.Button(ventana, text="Seleccionar Evento", command=lambda: bloquearEvento())
         boton_bloquear.place(x=25, y=300)
+
+        # Elementos ocultos al inicio
+        mod_label = tk.Label(ventana, text="Modificación de Datos del Evento (opcional):", font=("Arial", 12, "bold"))
+        magnitud_label = tk.Label(ventana, text="Magnitud:", font=("Arial", 10, "bold"))
+        magnitud_input = tk.Entry(ventana)
+        alcance_label = tk.Label(ventana, text="Alcance:", font=("Arial", 10, "bold"))
+        alcance_input = tk.Entry(ventana)
+        origen_label = tk.Label(ventana, text="Origen:", font=("Arial", 10, "bold"))
+        origen_input = tk.Entry(ventana)
+        modificar_button = tk.Button(ventana, text="Modificar Datos")
+
+        sismograma_text = tk.Label(ventana, text="Sismograma", font=("Arial", 12, "bold"))
+        sismograma = Image.open("sismograma.jpg")
+        sismograma_pic = ImageTk.PhotoImage(sismograma)
+        sismograma_label = tk.Label(ventana, image=sismograma_pic)
+        sismograma_label.image = sismograma_pic
+
+        opcion = tk.StringVar(value="1")
+        confirmar = tk.Radiobutton(ventana, text="Confirmar Evento", variable=opcion, value="1")
+        rechazar = tk.Radiobutton(ventana, text="Rechazar Evento", variable=opcion, value="2")
+        solicitarRAE = tk.Radiobutton(ventana, text="Solicitar Revisión a Experto", variable=opcion, value="3")
+
+        confirmacion_boton = tk.Button(
+            ventana,
+            text="Confirmar Selección de Acción",
+            command=lambda: self.procesarAccion(opcion, self.evento_seleccionado)
+        )
+
+        for widget in [
+            mod_label, magnitud_label, magnitud_input,
+            alcance_label, alcance_input, origen_label, origen_input,
+            modificar_button, sismograma_text, sismograma_label,
+            confirmar, rechazar, solicitarRAE, confirmacion_boton
+        ]:
+            widget.place_forget()
+
+        def bloquearEvento():
+            seleccion = eventos_lista.curselection()
+            if not seleccion:
+                messagebox.showwarning("Advertencia", "Por favor, seleccioná un evento.")
+                return
+
+            index = seleccion[0]
+            evento = self.eventos_cargados[index]
+            self.evento_seleccionado = evento
+            print("POST")
+            self.gestor.bloquearEventoSismico(evento)
+            print("PRE")
+            messagebox.showinfo("Éxito", "Evento bloqueado con éxito.")
+
+            # ❗ Eliminar el evento de la lista visual y del backend
+            eventos_lista.delete(index)
+            del self.eventos_cargados[index]
+
+            # ❌ NO limpiamos los campos de datos → se mantienen visibles
+
+            info = self.gestor.buscarDatosSismicos(evento)
+
+            base_y = 380
+            mod_label.place(x=25, y=base_y)
+            magnitud_label.place(x=25, y=base_y + 40)
+            magnitud_input.place(x=120, y=base_y + 40)
+            alcance_label.place(x=25, y=base_y + 80)
+            alcance_input.place(x=120, y=base_y + 80)
+            origen_label.place(x=25, y=base_y + 120)
+            origen_input.place(x=120, y=base_y + 120)
+            modificar_button.place(x=25, y=base_y + 160)
+
+            sismograma_text.place(x=1000, y=20)
+            sismograma_label.place(x=1000, y=60)
+            confirmar.place(x=1000, y=350)
+            rechazar.place(x=1000, y=380)
+            solicitarRAE.place(x=1000, y=410)
+            confirmacion_boton.place(x=1000, y=450)
 
         ventana.mainloop()

@@ -7,11 +7,14 @@ if root_path not in sys.path:
     sys.path.insert(0, root_path)
 
 from entidad.Estado import Estado
-from entidad.Empleado import Empleado
+from entidad.Usuario import Usuario
+from datetime import datetime
 
 class CambioEstado:
-    def __init__(self, fechaHoraInicio, fechaHoraFin, estado, empleado):
+    def __init__(self, fechaHoraInicio, fechaHoraFin, estado, usuario):
         self.fechaHoraInicio = fechaHoraInicio
         self.fechaHoraFin = fechaHoraFin
         self.estado = estado
-        self.empleado = empleado
+        self.usuario = usuario
+    
+

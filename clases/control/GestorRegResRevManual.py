@@ -1,36 +1,73 @@
 from datetime import datetime
 from instancias import eventosSismicos
-from instancias import Sesion
+from instancias import SesionActual
+from instancias import estados
+from entidad.EventoSismico import EventoSismico
 
 class GestorRegResRevManual:
     def __init__(self):
-        pass
+        self.estado = None
+        self.eventos = []
+        self.usuarioLogueado = None
+
+    def setEstado(self, estado):
+        self.estado = estado
+    
+    def setUsuarioLogueado(self, usuarioLogueado):
+        self.usuarioLogueado = usuarioLogueado
+
+
+
 
     def buscarEventoSismicoAD(self):
-        eventos_pendientes = []
-        for evento in eventosSismicos:
-            if evento.estado.esPendienteRevision():
-                eventos_pendientes.append(evento)
-        print(eventos_pendientes)
-        return eventos_pendientes
+        for estadoPR in estados:
+            if estadoPR.nombre == "pendiente de revisión":
+                self.estado = estadoPR.nombre
+                print(self.estado)
+                break
+        
+        for eventosPR in eventosSismicos:
+            if eventosPR.estado.nombre == self.estado:
+                self.eventos.append(eventosPR)
+        
+        return self.eventos
+    
 
+    def buscarEstadoBloqueado(self):
+        for estadoBR in estados:
+            if estadoBR.esAmbitoEventoSismico():
+                if estadoBR.esBloqueadoEnRevision():
+                    return estadoBR.nombre
+    
+    def buscarEstadoRechazado(self):
+        for estadoBR in estados:
+            if estadoBR.esAmbitoEventoSismico():
+                if estadoBR.esRechazado():
+                    return estadoBR.nombre
+    
+    def tomarFechaHoraActual(self):
+        fecha_hora_actual = datetime.now()
+        return fecha_hora_actual
+    
+    def buscarUsuarioLogueado(self):
+        self.setUsuarioLogueado(SesionActual.getUsuarioLogueado())
+        print(self.setUsuarioLogueado(SesionActual.getUsuarioLogueado()))
+
+
+    def bloquearEventoSismico(self, evento):
+        evento.bloquearEventoSismico(self.estado, self.usuarioLogueado)
+        
     def getDatosPrincipales(self):
         eventostmp = self.buscarEventoSismicoAD()
         return [evento.getDatosPrincipales() for evento in eventostmp]
-    
-    def bloquearEventoSismicoYRevisar(self, evento):
-        for cambio in evento.cambioEstado:
-            if evento.estado.nombre == cambio.estado.nombre:
-                evento.actualizarEstado(datetime.now(), datetime.now(), evento, "bloqueado en revisión", Sesion[0])
-                break
 
-    
     def buscarDatosSismicos(self, evento):
-            if evento is None:
-                print("[ERROR] Evento es None.")
-                return []
-            return evento.getDatosSismicos()
-    
-    def actualizarCambioEstado(self, evento, accion):
-        evento.actualizarEstado(datetime.now(), datetime.now(), evento, accion, Sesion[0])
-        print(evento.cambioEstado[-1])
+        if evento is None:
+            print("[ERROR] Evento es None.")
+            return []
+        return evento.getDatosSismicos()
+
+
+    def rechazarEventoSismico(self, evento):
+        estadoRechazado = self.buscarEstadoRechazado()
+        evento.rechazarEventoSismico(estadoRechazado, self.usuarioLogueado)
